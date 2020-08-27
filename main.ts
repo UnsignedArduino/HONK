@@ -94,6 +94,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             . . . f f f . . . . f f f f . . . . . . . . . . 
             . . . . . . . . . . . . . . . . . . . . . . . . 
             `)
+        music.pewPew.play()
     }
 })
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -179,8 +180,8 @@ HonkPos = 2
 game.onUpdate(function () {
     if (Car.x > 24 * 16) {
         Car.x = 5 * 16
-        Car.vx += 8
         if (!(Splash)) {
+            Car.vx += 8
             for (let Index = 0; Index <= 4; Index++) {
                 summon_slow_car(Car.vx * 0.333, 2, 11, Index + 2)
             }
