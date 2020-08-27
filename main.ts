@@ -64,37 +64,41 @@ function summon_slow_car (speed: number, num: number, x: number, y: number) {
     tiles.placeOnTile(SlowCars[SlowCars.length - 1], tiles.getTileLocation(x, y))
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (Splash) {
-        color.startFade(color.originalPalette, color.Black, 500)
-        color.pauseUntilFadeDone()
-        pause(1000)
-        controller.moveSprite(Car, 0, 64)
-        init_car_location(32)
-        Splash = false
-        color.startFade(color.Black, color.originalPalette, 500)
-    } else {
-        if (SlowCars.length >= HonkPos && sprites.readDataBoolean(SlowCars[HonkPos], "Destroy")) {
-            sprites.changeDataNumberBy(SlowCars[HonkPos], "Num", -1)
+    if (!(Dead)) {
+        if (Splash) {
+            color.startFade(color.originalPalette, color.Black, 500)
+            color.pauseUntilFadeDone()
+            pause(1000)
+            controller.moveSprite(Car, 0, 64)
+            init_car_location(32)
+            Splash = false
+            color.startFade(color.Black, color.originalPalette, 500)
+        } else {
+            if (SlowCars.length >= HonkPos && sprites.readDataBoolean(SlowCars[HonkPos], "Destroy")) {
+                sprites.changeDataNumberBy(SlowCars[HonkPos], "Num", -1)
+            }
+            Car.setImage(img`
+                . . . . . . . . . . . . . . . . . . . . . . . . 
+                . . . . 2 2 2 2 2 2 2 2 . . . . . . . . . . . . 
+                . . . 2 4 2 2 2 2 2 2 c 2 . . . . . . . . . . . 
+                . . 2 c 4 2 2 2 2 2 2 c c 2 . . . . . . . . f . 
+                . 2 c c 4 4 4 4 4 4 2 c c 4 2 d . . . . . f . . 
+                . 2 c 2 e e e e e e e b c 4 2 2 . . . . f . . . 
+                . 2 2 e b b e b b b e e b 4 2 2 . . . f . f f . 
+                . 2 e b b b e b b b b e 2 2 2 2 . . f f f . . . 
+                . e e 2 2 2 e 2 2 2 2 2 e 2 2 2 . f f f f f f . 
+                . e e e e e e f e e e f e 2 d d . . f f f . . . 
+                . e e e e e e f e e f e e e 2 d . . . f . f f . 
+                . e e e e e e f f f e e e e e e . . . . f . . . 
+                . e f f f f e e e e f f f e e e . . . . . f . . 
+                . . f f f f f e e f f f f f e . . . . . . . f . 
+                . . . f f f . . . . f f f f . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . . . . . . . . . 
+                `)
+            timer.throttle("Beep", 100, function () {
+                music.playTone(554, music.beat(BeatFraction.Half))
+            })
         }
-        Car.setImage(img`
-            . . . . . . . . . . . . . . . . . . . . . . . . 
-            . . . . 2 2 2 2 2 2 2 2 . . . . . . . . . . . . 
-            . . . 2 4 2 2 2 2 2 2 c 2 . . . . . . . . . . . 
-            . . 2 c 4 2 2 2 2 2 2 c c 2 . . . . . . . . f . 
-            . 2 c c 4 4 4 4 4 4 2 c c 4 2 d . . . . . f . . 
-            . 2 c 2 e e e e e e e b c 4 2 2 . . . . f . . . 
-            . 2 2 e b b e b b b e e b 4 2 2 . . . f . f f . 
-            . 2 e b b b e b b b b e 2 2 2 2 . . f f f . . . 
-            . e e 2 2 2 e 2 2 2 2 2 e 2 2 2 . f f f f f f . 
-            . e e e e e e f e e e f e 2 d d . . f f f . . . 
-            . e e e e e e f e e f e e e 2 d . . . f . f f . 
-            . e e e e e e f f f e e e e e e . . . . f . . . 
-            . e f f f f e e e e f f f e e e . . . . . f . . 
-            . . f f f f f e e f f f f f e . . . . . . . f . 
-            . . . f f f . . . . f f f f . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . . . . . . . . . 
-            `)
-        music.pewPew.play()
     }
 })
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -133,10 +137,20 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     sprite.startEffect(effects.fire)
     otherSprite.destroy(effects.fire, 100)
     sprite.destroy()
-    pause(5000)
-    game.over(false)
+    for (let SlowCar of SlowCars) {
+        sprites.setDataBoolean(SlowCar, "Destroy", false)
+    }
+    Dead = true
+    for (let index = 0; index < 16; index++) {
+        music.playTone(139, music.beat(BeatFraction.Sixteenth))
+        music.rest(music.beat(BeatFraction.Sixteenth))
+    }
+    timer.after(5000, function () {
+        game.over(false)
+    })
 })
 let RandomNumber = 0
+let Dead = false
 let HonkPos = 0
 let SlowCars: Sprite[] = []
 let Splash = false
@@ -177,13 +191,19 @@ scene.cameraFollowSprite(Car)
 Splash = true
 SlowCars = []
 HonkPos = 2
+Dead = false
 game.onUpdate(function () {
     if (Car.x > 24 * 16) {
         Car.x = 5 * 16
         if (!(Splash)) {
             Car.vx += 8
+            RandomNumber = randint(0, 4)
             for (let Index = 0; Index <= 4; Index++) {
-                summon_slow_car(Car.vx * 0.333, 2, 11, Index + 2)
+                if (Index == RandomNumber) {
+                    summon_slow_car(Car.vx * 0.333, randint(1, 3), 11, Index + 2)
+                } else {
+                    summon_slow_car(Car.vx * 0.333, randint(5, 15), 11, Index + 2)
+                }
             }
         }
     }
@@ -198,13 +218,11 @@ game.onUpdate(function () {
     } else {
         HonkPos = 4
     }
-    if (!(Splash)) {
-        Car.say(convertToText(HonkPos))
-    }
     for (let SlowCar of SlowCars) {
         SlowCar.say(convertToText(sprites.readDataNumber(SlowCar, "Num")))
         if (sprites.readDataNumber(SlowCar, "Num") <= 0 && sprites.readDataBoolean(SlowCar, "Destroy")) {
             SlowCar.destroy(effects.halo, 100)
+            music.magicWand.play()
             for (let SlowCar of SlowCars) {
                 sprites.setDataBoolean(SlowCar, "Destroy", false)
             }
