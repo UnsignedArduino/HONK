@@ -1,0 +1,45 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable type="KIND_SpriteKind" id="CWy,xL-4W~*JKmT_=izC">Player</variable><variable type="KIND_SpriteKind" id="r+=P!J~{A?AGm1a$XVaz">Projectile</variable><variable type="KIND_SpriteKind" id="w/rYnKVBo)Q=TYpaY@XE">Food</variable><variable type="KIND_SpriteKind" id="KqCyW{_x`4MC=!6#,s2S">Enemy</variable><variable id="zv_D`0g9D0|%uZ0*_T^T">Car</variable></variables><block type="pxt-on-start" id="dJ-)D$!C-?mrks)1[[K:" x="10" y="30"><statement name="HANDLER"><block type="variables_set" id="1.[Dhgt*Q}(~P%?dB*vA"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field><value name="VALUE"><shadow xmlns="http://www.w3.org/1999/xhtml" type="math_number"><field name="NUM">0</field></shadow><block type="spritescreate" id="-9i3UeAfMFLJiJ7CbH?7"><value name="img"><shadow type="screen_image_picker"><field name="img">img`
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+`</field></shadow><block type="screen_image_picker" id=":0!S?%#pTj~60Sz1ynY-"><field name="img">img`
+. . . . . . . . . . . . . . . . 
+. . . . 2 2 2 2 2 2 2 2 . . . . 
+. . . 2 4 2 2 2 2 2 2 c 2 . . . 
+. . 2 c 4 2 2 2 2 2 2 c c 2 . . 
+. 2 c c 4 4 4 4 4 4 2 c c 4 2 d 
+. 2 c 2 e e e e e e e b c 4 2 2 
+. 2 2 e b b e b b b e e b 4 2 2 
+. 2 e b b b e b b b b e 2 2 2 2 
+. e e 2 2 2 e 2 2 2 2 2 e 2 2 2 
+. e e e e e e f e e e f e 2 d d 
+. e e e e e e f e e f e e e 2 d 
+. e e e e e e f f f e e e e e e 
+. e f f f f e e e e f f f e e e 
+. . f f f f f e e f f f f f e . 
+. . . f f f . . . . f f f f . . 
+. . . . . . . . . . . . . . . . 
+`</field></block></value><value name="kind"><shadow type="spritekind" id="Y:fh%RCFg%t%zEN!6dND"><field name="MEMBER">Player</field></shadow></value></block></value><next><block type="spritesetsetflag" id="(d4Oxtj$CL9=n3Z[2%1k"><field name="flag">SpriteFlag.StayInScreen</field><value name="sprite"><block type="variables_get" id=".-[kL`]5/^iIC7:%Yc`I"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="on"><shadow type="toggleOnOff" id="5TK`r85=ep$GUkgnx*|j"><field name="on">true</field></shadow></value><next><block type="spritesetsetflag" id="riCM0i[LFN?3rQ]!6:dY"><field name="flag">SpriteFlag.ShowPhysics</field><value name="sprite"><block type="variables_get" id="WQt}W8=]6UKH_iN.R$cK"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="on"><shadow type="toggleOnOff" id="K#}?cPD4QUB^XNHI#R8Y"><field name="on">true</field></shadow></value><next><block type="game_control_sprite" id="QmYUxS53k)/iA)gPda5_"><mutation xmlns="http://www.w3.org/1999/xhtml" _expanded="2" _input_init="true"></mutation><value name="sprite"><block type="variables_get" id="U!F.3C6LR7(Y6+p|0b3%"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="vx"><shadow type="math_number" id="0B6vdOy4-A.dGBTK;a8)"><field name="NUM">0</field></shadow></value><value name="vy"><shadow type="math_number" id="BFGL7DU|Ihgq~aC7dp)?"><field name="NUM">64</field></shadow></value><next><block type="tilemap_editor" id="k#S/-UucR!EvYaZ6!x/{"><field name="tilemap">tiles.createTilemap(hex`1e000900040101050101040301010104010301010104010401010501010403010101010103010104010105010301010104010301010101030101040101050103020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020206020202020202020202020202020202020202060202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202010104010101050101010103010101050101010101040101010501010101050101030104010301010401010401010301010501010301040103010104`, img`
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
+`, [myTiles.transparency16,myTiles.tile1,sprites.vehicle.roadHorizontal,sprites.castle.tileGrass2,sprites.castle.tileGrass1,sprites.castle.tileGrass3,sprites.dungeon.collectibleInsignia], TileScale.Sixteen)</field><next><block type="mapplaceontile" id="cC;9sjP|6XqV.j:$2ci,"><value name="sprite"><block type="variables_get" id="f:,YQr=w.Nb7TqW-y8$("><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="loc"><shadow type="mapgettile" id="6aNhSn=DO:v_t#QPX9O;"><value name="col"><shadow type="math_number" id="Ln01vf*n1QdS0R=i03@*"><field name="NUM">0</field></shadow></value><value name="row"><shadow type="math_number" id="l,h$=c~=ejjR:zQuEM/0"><field name="NUM">4</field></shadow></value></shadow></value><next><block type="Sprite_blockCombine_set" id="OVbHp%MU;vs%$4^@[Pws"><field name="property">Sprite.x@set</field><value name="mySprite"><block type="variables_get" id="cYj=[g{)dvEGy{LSuV0?"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="value"><shadow type="math_number" id="`EHQS^{=3~J6QYK-w9Ey"><field name="NUM">16</field></shadow></value><next><block type="Sprite_blockCombine_set" id="~mzIUHfUF|Rd_kJ4|;Of"><field name="property">Sprite.vx@set</field><value name="mySprite"><block type="variables_get" id="zAT}J~JSOhfQ7429CRSr"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="value"><shadow type="math_number" id="A~-l{N^d0CB1nzrI.Cx]"><field name="NUM">64</field></shadow></value><next><block type="camerafollow" id="D|=]sFtD@|7cjp:va0Z`"><value name="sprite"><block type="variables_get" id="21~LZBy|fRd2HG5Vk/W+"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></statement></block><block type="gameupdate" id="u/9S0vBH%GJ2^_:`ZgLK" x="590" y="30"><statement name="HANDLER"><block type="controls_if" id="6(7.A[d~Vht%I-YEM,ci"><value name="IF0"><shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow><block type="logic_compare" id="j0-X083]o9kJ]^`Jl2dD"><field name="OP">GT</field><value name="A"><shadow type="math_number"><field name="NUM">0</field></shadow><block type="Sprite_blockCombine_get" id=":BMxt]Pdo1#Mu5QKSZm_"><field name="property">Sprite.x</field><value name="mySprite"><block type="variables_get" id="#}KStMpz;Fe%dD*E+@a`"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value></block></value><value name="B"><shadow type="math_number"><field name="NUM">400</field></shadow><block type="math_arithmetic" id="Uk2:kD-E,vK},W8@o+Kw"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="GZ-6}@?[)lV5m2sXz:pw"><field name="NUM">24</field></shadow></value><value name="B"><shadow type="math_number" id="A7[E@@iu,.-|Jaum/Eqp"><field name="NUM">16</field></shadow></value></block></value></block></value><statement name="DO0"><block type="Sprite_blockCombine_set" id="y1hNBu,3xYqvp9[a#%wv"><field name="property">Sprite.x@set</field><value name="mySprite"><block type="variables_get" id="[,c:fcPElbdZcl2+Gk:?"><field name="VAR" id="zv_D`0g9D0|%uZ0*_T^T">Car</field></block></value><value name="value"><shadow type="math_number"><field name="NUM">80</field></shadow><block type="math_arithmetic" id="EK|,ja6r48xwsdbRMEpI"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="ANo/edF)%Lufq[z+sfA^"><field name="NUM">5</field></shadow></value><value name="B"><shadow type="math_number" id="JKoCKypYLJZ|Vg-x-i^U"><field name="NUM">16</field></shadow></value></block></value></block></statement></block></statement></block></xml>
