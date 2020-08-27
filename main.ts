@@ -165,7 +165,7 @@ game.onUpdate(function () {
     for (let SlowCar of SlowCars) {
         SlowCar.say(convertToText(sprites.readDataNumber(SlowCar, "Num")))
         if (sprites.readDataNumber(SlowCar, "Num") <= 0 && sprites.readDataBoolean(SlowCar, "Destroy")) {
-            SlowCar.destroy()
+            SlowCar.destroy(effects.halo, 100)
             for (let SlowCar of SlowCars) {
                 sprites.setDataBoolean(SlowCar, "Destroy", false)
             }
