@@ -61,10 +61,10 @@ function summon_slow_car (speed: number, num: number, x: number, y: number) {
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.Enemy))
     }
-    SlowCars[SlowCars.length - 1].vx = speed
-    sprites.setDataNumber(SlowCars[SlowCars.length - 1], "Num", num)
-    sprites.setDataBoolean(SlowCars[SlowCars.length - 1], "Destroy", true)
-    tiles.placeOnTile(SlowCars[SlowCars.length - 1], tiles.getTileLocation(x, y))
+    get_last_slowcar().vx = speed
+    sprites.setDataNumber(get_last_slowcar(), "Num", num)
+    sprites.setDataBoolean(get_last_slowcar(), "Destroy", true)
+    tiles.placeOnTile(get_last_slowcar(), tiles.getTileLocation(x, y))
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     timer.throttle("ChangeColors", 1000, function () {
@@ -91,7 +91,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             color.pauseUntilFadeDone()
             pause(1000)
             controller.moveSprite(Car, 0, 64)
-            init_car_location(32)
+            init_car_location(16)
             Splash = false
             info.setScore(0)
             info.setLife(3)
@@ -112,6 +112,9 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     Car.setImage(CarImages[SelectedCarImage][0])
 })
+function get_last_slowcar () {
+    return SlowCars[SlowCars.length - 1]
+}
 info.onLifeZero(function () {
     Car.destroy(effects.fire, 100)
     make_slow_cars_undestructible()
@@ -320,6 +323,7 @@ if (blockSettings.exists("HONK!:SelectedCarImage")) {
 } else {
     SelectedCarImage = 0
 }
+Car.setImage(CarImages[SelectedCarImage][0])
 game.onUpdate(function () {
     if (Car.x > 24 * 16) {
         Car.x = 5 * 16
