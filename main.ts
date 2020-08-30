@@ -67,17 +67,16 @@ function summon_slow_car (speed: number, num: number, x: number, y: number) {
     tiles.placeOnTile(get_last_slowcar(), tiles.getTileLocation(x, y))
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    timer.throttle("ChangeColors", 1000, function () {
-        if (Splash) {
-            SelectedCarImage += 1
-            if (SelectedCarImage == 3) {
-                SelectedCarImage = 0
-            }
-            Car.startEffect(effects.halo, 2000)
-            imagemorph.morph(Car, CarImages[SelectedCarImage][0])
-            blockSettings.writeNumber("HONK!:SelectedCarImage", SelectedCarImage)
+    if (Splash) {
+        SelectedCarImage += 1
+        if (SelectedCarImage == 3) {
+            SelectedCarImage = 0
         }
-    })
+        Car.startEffect(effects.halo, 2000)
+        imagemorph.morph(Car, CarImages[SelectedCarImage][0])
+        blockSettings.writeNumber("HONK!:SelectedCarImage", SelectedCarImage)
+    }
+    pause(1000)
 })
 function make_slow_cars_undestructible () {
     for (let SlowCar of SlowCars) {
@@ -91,7 +90,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             color.pauseUntilFadeDone()
             pause(1000)
             controller.moveSprite(Car, 0, 64)
-            init_car_location(16)
+            init_car_location(8)
+            Car.x = 23 * 16
             Splash = false
             info.setScore(0)
             info.setLife(3)
@@ -129,6 +129,26 @@ info.onLifeZero(function () {
         game.over(false)
     })
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    info.changeScoreBy(randint(5, 20))
+    sprite.startEffect(effects.halo, 100)
+    otherSprite.destroy(effects.disintegrate, 100)
+    music.powerUp.play()
+})
+function summon_coin (x: number, y: number) {
+    Coin = sprites.create(img`
+        . . b b b b . . 
+        . b 5 5 5 5 b . 
+        b 5 d 3 3 d 5 b 
+        b 5 3 5 5 1 5 b 
+        c 5 3 5 5 1 d c 
+        c d d 1 1 d d c 
+        . f d d d d f . 
+        . . f f f f . . 
+        `, SpriteKind.Food)
+    Coin.lifespan = 6000
+    tiles.placeOnTile(Coin, tiles.getTileLocation(x, y))
+}
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     for (let SlowCar of SlowCars) {
         SlowCar.ax = SlowCar.vx * -2
@@ -148,6 +168,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     info.changeLifeBy(-1)
     make_slow_cars_undestructible()
 })
+let Coin: Sprite = null
 let RandomNumber = 0
 let SelectedCarImage = 0
 let CarImages: Image[][] = []
@@ -336,6 +357,9 @@ game.onUpdate(function () {
                 } else {
                     summon_slow_car(Car.vx * 0.333, randint(5, 15), 11, Index + 2)
                 }
+            }
+            if (Math.percentChance(10)) {
+                summon_coin(11, randint(0, 4) + 2)
             }
         }
     }
