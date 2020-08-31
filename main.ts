@@ -1,5 +1,7 @@
 namespace SpriteKind {
     export const Info = SpriteKind.create()
+    export const Coin = SpriteKind.create()
+    export const Heart = SpriteKind.create()
 }
 function summon_slow_car (speed: number, num: number, x: number, y: number) {
     RandomNumber = randint(0, 2)
@@ -109,6 +111,25 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSprite) {
+    info.changeLifeBy(1)
+    sprite.startEffect(effects.halo, 100)
+    otherSprite.destroy(effects.disintegrate, 100)
+    music.powerUp.play()
+})
+function summon_heart (x: number, y: number) {
+    Heart = sprites.create(img`
+        . c 2 2 . . 2 2 . 
+        c 2 2 2 2 2 2 2 2 
+        c 2 2 2 2 2 2 2 2 
+        c 2 2 2 2 2 2 2 2 
+        . c 2 2 2 2 2 2 . 
+        . . c 2 2 2 2 . . 
+        . . . c 2 2 . . . 
+        `, SpriteKind.Heart)
+    Heart.lifespan = 6000
+    tiles.placeOnTile(Heart, tiles.getTileLocation(x, y))
+}
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     Car.setImage(CarImages[SelectedCarImage][0])
 })
@@ -145,13 +166,13 @@ function summon_coin (x: number, y: number) {
         c d d 1 1 d d c 
         . f d d d d f . 
         . . f f f f . . 
-        `, SpriteKind.Food)
+        `, SpriteKind.Coin)
     Coin.lifespan = 6000
     tiles.placeOnTile(Coin, tiles.getTileLocation(x, y))
 }
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     for (let SlowCar of SlowCars) {
-        SlowCar.ax = SlowCar.vx * -2
+        SlowCar.ax = Math.abs(SlowCar.vx) * -2
         SlowCar.setFlag(SpriteFlag.AutoDestroy, true)
     }
     make_slow_cars_undestructible()
@@ -169,6 +190,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     make_slow_cars_undestructible()
 })
 let Coin: Sprite = null
+let Heart: Sprite = null
 let RandomNumber = 0
 let SelectedCarImage = 0
 let CarImages: Image[][] = []
@@ -360,6 +382,9 @@ game.onUpdate(function () {
             }
             if (Math.percentChance(10)) {
                 summon_coin(11, randint(0, 4) + 2)
+            }
+            if (Math.percentChance(10)) {
+                summon_heart(11, randint(0, 4) + 2)
             }
         }
     }
