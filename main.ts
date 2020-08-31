@@ -3,6 +3,11 @@ namespace SpriteKind {
     export const Coin = SpriteKind.create()
     export const Heart = SpriteKind.create()
 }
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Splash)) {
+        Car.vy = -32
+    }
+})
 function summon_slow_car (speed: number, num: number, x: number, y: number) {
     RandomNumber = randint(0, 2)
     if (RandomNumber == 0) {
@@ -91,7 +96,6 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             color.startFade(color.originalPalette, color.Black, 500)
             color.pauseUntilFadeDone()
             pause(1000)
-            controller.moveSprite(Car, 0, 64)
             init_car_location(8)
             Car.x = 23 * 16
             Splash = false
@@ -109,6 +113,12 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                 music.playTone(554, music.beat(BeatFraction.Half))
             })
         }
+    }
+})
+controller.down.onEvent(ControllerButtonEvent.Released, function () {
+    Car.vy = 0
+    for (let index = 0; index < Car.bottom % 16; index++) {
+        Car.y += 1
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSprite) {
@@ -133,9 +143,20 @@ function summon_heart (x: number, y: number) {
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     Car.setImage(CarImages[SelectedCarImage][0])
 })
+controller.up.onEvent(ControllerButtonEvent.Released, function () {
+    Car.vy = 0
+    for (let index = 0; index < Car.bottom % 16; index++) {
+        Car.y += -1
+    }
+})
 function get_last_slowcar () {
     return SlowCars[SlowCars.length - 1]
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Splash)) {
+        Car.vy = 32
+    }
+})
 info.onLifeZero(function () {
     Car.destroy(effects.fire, 100)
     make_slow_cars_undestructible()
@@ -388,17 +409,19 @@ game.onUpdate(function () {
             }
         }
     }
-    if (Car.y < 16 * 4 - 16) {
+    if (Car.y < 16 * 3) {
         HonkPos = 0
-    } else if (Car.y < 16 * 5 - 16) {
+    } else if (Car.y < 16 * 4) {
         HonkPos = 1
-    } else if (Car.y < 16 * 6 - 16) {
+    } else if (Car.y < 16 * 5) {
         HonkPos = 2
-    } else if (Car.y < 16 * 7 - 16) {
+    } else if (Car.y < 16 * 6) {
         HonkPos = 3
     } else {
         HonkPos = 4
     }
+})
+game.onUpdate(function () {
     for (let SlowCar of SlowCars) {
         SlowCar.say(convertToText(sprites.readDataNumber(SlowCar, "Num")))
         if (sprites.readDataNumber(SlowCar, "Num") <= 0 && sprites.readDataBoolean(SlowCar, "Destroy")) {
