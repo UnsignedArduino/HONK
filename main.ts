@@ -145,7 +145,7 @@ controller.A.onEvent(ControllerButtonEvent.Released, function () {
 })
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
     Car.vy = 0
-    for (let index = 0; index < Car.bottom % 16; index++) {
+    for (let index = 0; index < 16 - Car.top % 16; index++) {
         Car.y += -1
     }
 })
