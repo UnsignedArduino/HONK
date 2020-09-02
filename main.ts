@@ -2,11 +2,18 @@ namespace SpriteKind {
     export const Info = SpriteKind.create()
     export const Coin = SpriteKind.create()
     export const Heart = SpriteKind.create()
+    export const PowerUp = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(Splash)) {
         Car.vy = -32
     }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite, otherSprite) {
+    info.changeScoreBy(randint(5, 20))
+    sprite.startEffect(effects.halo, 100)
+    otherSprite.destroy(effects.disintegrate, 100)
+    music.powerUp.play()
 })
 function summon_slow_car (speed: number, num: number, x: number, y: number) {
     RandomNumber = randint(0, 2)
@@ -105,8 +112,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             color.startFade(color.Black, color.originalPalette, 500)
         } else {
             if (SlowCars.length >= HonkPos && sprites.readDataBoolean(SlowCars[HonkPos], "Destroy")) {
-                sprites.changeDataNumberBy(SlowCars[HonkPos], "Num", -1)
-                info.changeScoreBy(1)
+                sprites.changeDataNumberBy(SlowCars[HonkPos], "Num", HonkPower * -1)
+                info.changeScoreBy(HonkPower)
             }
             Car.setImage(CarImages[SelectedCarImage][1])
             timer.throttle("Honk", music.beat(BeatFraction.Half), function () {
@@ -115,11 +122,28 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+function run_crash_noise () {
+    timer.background(function () {
+        for (let index = 0; index < 16; index++) {
+            music.playTone(139, music.beat(BeatFraction.Sixteenth))
+            music.rest(music.beat(BeatFraction.Sixteenth))
+        }
+    })
+}
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     Car.vy = 0
     for (let index = 0; index < Car.bottom % 16; index++) {
         Car.y += 1
     }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.PowerUp, function (sprite, otherSprite) {
+    if (sprites.readDataString(otherSprite, "Type") == "extra noise") {
+        HonkPower += 1
+        Car.say("Honk power: " + HonkPower, 2000)
+    }
+    sprite.startEffect(effects.halo, 100)
+    otherSprite.destroy(effects.disintegrate, 100)
+    music.powerUp.play()
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSprite) {
     info.changeLifeBy(1)
@@ -127,6 +151,18 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSp
     otherSprite.destroy(effects.disintegrate, 100)
     music.powerUp.play()
 })
+function play_music () {
+    while (true) {
+        music.rest(music.beat(BeatFraction.Double))
+        for (let Index = 0; Index <= Song.length; Index++) {
+            if (Song[Index] == 0) {
+                music.rest(Durations[Index])
+            } else {
+                music.playTone(Song[Index], Durations[Index])
+            }
+        }
+    }
+}
 function summon_heart (x: number, y: number) {
     Heart = sprites.create(img`
         . c 2 2 . . 2 2 . 
@@ -137,7 +173,7 @@ function summon_heart (x: number, y: number) {
         . . c 2 2 2 2 . . 
         . . . c 2 2 . . . 
         `, SpriteKind.Heart)
-    Heart.lifespan = 6000
+    Heart.lifespan = 5000
     tiles.placeOnTile(Heart, tiles.getTileLocation(x, y))
 }
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -157,26 +193,86 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         Car.vy = 32
     }
 })
+function summon_powerup_extra_noise (x: number, y: number) {
+    PowerUp = sprites.create(img`
+        . . . . . . . . . . c c c b b . . . . . . . . . 
+        . . . . . . . . . c b 1 1 d b b . . . . . . . . 
+        . . . . . . . . c d 1 1 c b d b . . . . 6 . . . 
+        . . . . c c c c b 1 1 c c c b d b . . . . 6 . . 
+        . c c c c b c c 1 1 c c c c c d b . . 6 . . 6 . 
+        c b 1 c b 1 b b 1 1 c d b c c b c . . . 6 . . 6 
+        c d b b 1 1 b b 1 d c d d c f b c . 6 . . 6 . 6 
+        c d b b d 1 b b d d b d b f f b c . . 6 . 6 . 6 
+        c d b b d d b b d d b b c f f b c . . 6 . 6 . 6 
+        c d b b b d b b d d f f f f f b c . 6 . . 6 . 6 
+        c b d b b b b b d d c f f f c b c . . . 6 . . 6 
+        . c c c c b c c d d b f f f b d b . . 6 . . 6 . 
+        . . . . c c c c b 1 1 d c b d b . . . . . 6 . . 
+        . . . . . . . . c b 1 1 1 d b b . . . . 6 . . . 
+        . . . . . . . . . c c c c c b . . . . . . . . . 
+        . . . . . . . . . . . . . . . . . . . . . . . . 
+        `, SpriteKind.PowerUp)
+    PowerUp.lifespan = 5000
+    sprites.setDataString(PowerUp, "Type", "extra noise")
+    tiles.placeOnTile(PowerUp, tiles.getTileLocation(x, y))
+}
 info.onLifeZero(function () {
     Car.destroy(effects.fire, 100)
     make_slow_cars_undestructible()
     Dead = true
-    timer.background(function () {
-        for (let index = 0; index < 16; index++) {
-            music.playTone(139, music.beat(BeatFraction.Sixteenth))
-            music.rest(music.beat(BeatFraction.Sixteenth))
-        }
-    })
+    run_crash_noise()
     timer.after(5000, function () {
         game.over(false)
     })
 })
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    info.changeScoreBy(randint(5, 20))
-    sprite.startEffect(effects.halo, 100)
-    otherSprite.destroy(effects.disintegrate, 100)
-    music.powerUp.play()
-})
+function add_measures_1_7 () {
+    for (let Note2 of [
+    784,
+    494,
+    659,
+    740,
+    784,
+    659,
+    740,
+    784
+    ]) {
+        add_note(Note2, music.beat(BeatFraction.Half))
+    }
+    add_note(740, music.beat(BeatFraction.Double))
+    add_note(988, music.beat(BeatFraction.Double))
+    for (let Note2 of [
+    659,
+    392,
+    523,
+    587,
+    659,
+    523,
+    587,
+    659
+    ]) {
+        add_note(Note2, music.beat(BeatFraction.Half))
+    }
+    add_note(587, music.beat(BeatFraction.Double))
+    add_note(784, music.beat(BeatFraction.Double))
+    for (let Note2 of [523, 330, 440, 494]) {
+        add_note(Note2, music.beat(BeatFraction.Half))
+    }
+    add_note(523, music.beat(BeatFraction.Double))
+    for (let Note2 of [494, 294, 392, 440]) {
+        add_note(Note2, music.beat(BeatFraction.Half))
+    }
+    add_note(494, music.beat(BeatFraction.Double))
+    for (let index = 0; index < 5; index++) {
+        add_note(659, music.beat(BeatFraction.Half))
+    }
+    for (let Note2 of [740, 659, 587]) {
+        add_note(Note2, music.beat(BeatFraction.Half))
+    }
+}
+function add_note (note: number, duration: number) {
+    Song.push(note)
+    Durations.push(duration)
+}
 function summon_coin (x: number, y: number) {
     Coin = sprites.create(img`
         . . b b b b . . 
@@ -188,7 +284,7 @@ function summon_coin (x: number, y: number) {
         . f d d d d f . 
         . . f f f f . . 
         `, SpriteKind.Coin)
-    Coin.lifespan = 6000
+    Coin.lifespan = 5000
     tiles.placeOnTile(Coin, tiles.getTileLocation(x, y))
 }
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
@@ -208,15 +304,20 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     scene.cameraShake(4, 500)
     otherSprite.destroy(effects.fire, 100)
     info.changeLifeBy(-1)
+    run_crash_noise()
     make_slow_cars_undestructible()
 })
 let Coin: Sprite = null
+let PowerUp: Sprite = null
 let Heart: Sprite = null
+let Durations: number[] = []
+let Song: number[] = []
 let RandomNumber = 0
 let SelectedCarImage = 0
 let CarImages: Image[][] = []
 let SplashScreen: Sprite = null
 let Dead = false
+let HonkPower = 0
 let HonkPos = 0
 let SlowCars: Sprite[] = []
 let Splash = false
@@ -257,6 +358,8 @@ scene.cameraFollowSprite(Car)
 Splash = true
 SlowCars = []
 HonkPos = 2
+HonkPower = 1
+let SlowCarHonks = 1
 Dead = false
 SplashScreen = sprites.create(img`
     . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -396,16 +499,20 @@ game.onUpdate(function () {
             RandomNumber = randint(0, 4)
             for (let Index = 0; Index <= 4; Index++) {
                 if (Index == RandomNumber) {
-                    summon_slow_car(Car.vx * 0.333, randint(1, 3), 11, Index + 2)
+                    summon_slow_car(Car.vx * 0.333, randint(SlowCarHonks, SlowCarHonks + 3), 11, Index + 2)
                 } else {
-                    summon_slow_car(Car.vx * 0.333, randint(5, 15), 11, Index + 2)
+                    summon_slow_car(Car.vx * 0.333, randint(SlowCarHonks + 4, SlowCarHonks + 14), 11, Index + 2)
                 }
             }
-            if (Math.percentChance(10)) {
+            if (Math.percentChance(30)) {
                 summon_coin(11, randint(0, 4) + 2)
             }
-            if (Math.percentChance(10)) {
+            if (Math.percentChance(20)) {
                 summon_heart(11, randint(0, 4) + 2)
+            }
+            if (Math.percentChance(10)) {
+                summon_powerup_extra_noise(11, randint(0, 4) + 2)
+                SlowCarHonks += randint(1, 3)
             }
         }
     }
@@ -530,5 +637,13 @@ forever(function () {
             . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
             `)
         pause(5000)
+    }
+})
+forever(function () {
+    Song = []
+    Durations = []
+    add_measures_1_7()
+    for (let Note2 of [659, 587, 659, 740]) {
+        add_note(Note2, music.beat(BeatFraction.Whole))
     }
 })
