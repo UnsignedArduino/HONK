@@ -78,8 +78,12 @@ function summon_slow_car (speed: number, num: number, x: number, y: number) {
     get_last_slowcar().vx = speed
     sprites.setDataNumber(get_last_slowcar(), "Num", num)
     sprites.setDataBoolean(get_last_slowcar(), "Destroy", true)
+    multilights.addLightSource(get_last_slowcar(), 8)
     tiles.placeOnTile(get_last_slowcar(), tiles.getTileLocation(x, y))
 }
+sprites.onDestroyed(SpriteKind.Coin, function (sprite) {
+    multilights.removeLightSource(sprite)
+})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (Splash) {
         SelectedCarImage += 1
@@ -89,8 +93,14 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         Car.startEffect(effects.halo, 2000)
         imagemorph.morph(Car, CarImages[SelectedCarImage][0])
         blockSettings.writeNumber("HONK!:SelectedCarImage", SelectedCarImage)
+        pause(1000)
+    } else {
+        color.startFade(color.originalPalette, color.Black, 250)
+        color.pauseUntilFadeDone()
+        Night = !(Night)
+        multilights.toggleLighting(Night)
+        color.startFade(color.Black, color.originalPalette, 250)
     }
-    pause(1000)
 })
 function make_slow_cars_undestructible () {
     for (let SlowCar of SlowCars) {
@@ -151,6 +161,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSp
     otherSprite.destroy(effects.disintegrate, 100)
     music.powerUp.play()
 })
+sprites.onDestroyed(SpriteKind.PowerUp, function (sprite) {
+    multilights.removeLightSource(sprite)
+})
 function summon_heart (x: number, y: number) {
     HeartSprite = sprites.create(img`
         . c 2 2 . . 2 2 . 
@@ -162,6 +175,7 @@ function summon_heart (x: number, y: number) {
         . . . c 2 2 . . . 
         `, SpriteKind.Heart)
     HeartSprite.lifespan = 5000
+    multilights.addLightSource(HeartSprite, 4)
     tiles.placeOnTile(HeartSprite, tiles.getTileLocation(x, y))
 }
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -202,6 +216,7 @@ function summon_powerup_extra_noise (x: number, y: number) {
         `, SpriteKind.PowerUp)
     PowerUpSprite.lifespan = 5000
     sprites.setDataString(PowerUpSprite, "Type", "extra noise")
+    multilights.addLightSource(PowerUpSprite, 4)
     tiles.placeOnTile(PowerUpSprite, tiles.getTileLocation(x, y))
 }
 info.onLifeZero(function () {
@@ -212,6 +227,9 @@ info.onLifeZero(function () {
     timer.after(5000, function () {
         game.over(false)
     })
+})
+sprites.onDestroyed(SpriteKind.Heart, function (sprite) {
+    multilights.removeLightSource(sprite)
 })
 function summon_coin (x: number, y: number) {
     CoinSprite = sprites.create(img`
@@ -225,6 +243,7 @@ function summon_coin (x: number, y: number) {
         . . f f f f . . 
         `, SpriteKind.Coin)
     CoinSprite.lifespan = 5000
+    multilights.addLightSource(CoinSprite, 4)
     tiles.placeOnTile(CoinSprite, tiles.getTileLocation(x, y))
 }
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
@@ -234,12 +253,16 @@ sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     }
     make_slow_cars_undestructible()
     SlowCars.removeAt(SlowCars.indexOf(sprite))
+    multilights.removeLightSource(sprite)
 })
 function init_car_location (speed: number) {
     tiles.placeOnTile(Car, tiles.getTileLocation(0, 4))
     Car.x = 16
     Car.vx = speed
 }
+sprites.onDestroyed(SpriteKind.Player, function (sprite) {
+    multilights.removeLightSource(sprite)
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     scene.cameraShake(4, 500)
     otherSprite.destroy(effects.fire, 100)
@@ -256,6 +279,7 @@ let SelectedCarImage = 0
 let CarImages: Image[][] = []
 let SplashScreen: Sprite = null
 let Dead = false
+let Night = false
 let HonkPower = 0
 let HonkPos = 0
 let SlowCars: Sprite[] = []
@@ -281,6 +305,7 @@ Car = sprites.create(img`
     `, SpriteKind.Player)
 Car.setFlag(SpriteFlag.StayInScreen, true)
 Car.setFlag(SpriteFlag.ShowPhysics, false)
+multilights.addLightSource(Car, 10)
 tiles.setTilemap(tiles.createTilemap(hex`1e000900040101050101040301010104010301010104010401010501010403010101010103010104010105010301010104010301010101030101040101050103020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202010104010101050101010103010101050101010101040101010501010101050101030104010301010401010401010301010501010301040103010104`, img`
     2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
     2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
@@ -299,6 +324,7 @@ SlowCars = []
 HonkPos = 2
 HonkPower = 1
 let SlowCarHonks = 1
+Night = false
 Dead = false
 SplashScreen = sprites.create(img`
     ................................................................................................................................................................
