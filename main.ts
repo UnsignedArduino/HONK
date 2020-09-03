@@ -152,7 +152,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSp
     music.powerUp.play()
 })
 function summon_heart (x: number, y: number) {
-    Heart = sprites.create(img`
+    HeartSprite = sprites.create(img`
         . c 2 2 . . 2 2 . 
         c 2 2 2 2 2 2 2 2 
         c 2 2 2 2 2 2 2 2 
@@ -161,8 +161,8 @@ function summon_heart (x: number, y: number) {
         . . c 2 2 2 2 . . 
         . . . c 2 2 . . . 
         `, SpriteKind.Heart)
-    Heart.lifespan = 5000
-    tiles.placeOnTile(Heart, tiles.getTileLocation(x, y))
+    HeartSprite.lifespan = 5000
+    tiles.placeOnTile(HeartSprite, tiles.getTileLocation(x, y))
 }
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     Car.setImage(CarImages[SelectedCarImage][0])
@@ -182,7 +182,7 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function summon_powerup_extra_noise (x: number, y: number) {
-    PowerUp = sprites.create(img`
+    PowerUpSprite = sprites.create(img`
         ..........cccbb.........
         .........cb11dbb........
         ........cd11cbdb....6...
@@ -200,9 +200,9 @@ function summon_powerup_extra_noise (x: number, y: number) {
         .........cccccb.........
         ........................
         `, SpriteKind.PowerUp)
-    PowerUp.lifespan = 5000
-    sprites.setDataString(PowerUp, "Type", "extra noise")
-    tiles.placeOnTile(PowerUp, tiles.getTileLocation(x, y))
+    PowerUpSprite.lifespan = 5000
+    sprites.setDataString(PowerUpSprite, "Type", "extra noise")
+    tiles.placeOnTile(PowerUpSprite, tiles.getTileLocation(x, y))
 }
 info.onLifeZero(function () {
     Car.destroy(effects.fire, 100)
@@ -214,7 +214,7 @@ info.onLifeZero(function () {
     })
 })
 function summon_coin (x: number, y: number) {
-    Coin = sprites.create(img`
+    CoinSprite = sprites.create(img`
         . . b b b b . . 
         . b 5 5 5 5 b . 
         b 5 d 3 3 d 5 b 
@@ -224,8 +224,8 @@ function summon_coin (x: number, y: number) {
         . f d d d d f . 
         . . f f f f . . 
         `, SpriteKind.Coin)
-    Coin.lifespan = 5000
-    tiles.placeOnTile(Coin, tiles.getTileLocation(x, y))
+    CoinSprite.lifespan = 5000
+    tiles.placeOnTile(CoinSprite, tiles.getTileLocation(x, y))
 }
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     for (let SlowCar of SlowCars) {
@@ -248,9 +248,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     make_slow_cars_undestructible()
     sprite.vx = sprite.vx * 0.9
 })
-let Coin: Sprite = null
-let PowerUp: Sprite = null
-let Heart: Sprite = null
+let CoinSprite: Sprite = null
+let PowerUpSprite: Sprite = null
+let HeartSprite: Sprite = null
 let RandomNumber = 0
 let SelectedCarImage = 0
 let CarImages: Image[][] = []
@@ -431,6 +431,19 @@ if (blockSettings.exists("HONK!:SelectedCarImage")) {
 }
 Car.setImage(CarImages[SelectedCarImage][0])
 game.onUpdate(function () {
+    if (Car.y < 16 * 3) {
+        HonkPos = 0
+    } else if (Car.y < 16 * 4) {
+        HonkPos = 1
+    } else if (Car.y < 16 * 5) {
+        HonkPos = 2
+    } else if (Car.y < 16 * 6) {
+        HonkPos = 3
+    } else {
+        HonkPos = 4
+    }
+})
+game.onUpdate(function () {
     if (Car.x > 24 * 16) {
         Car.x = 5 * 16
         if (!(Splash)) {
@@ -455,17 +468,6 @@ game.onUpdate(function () {
             }
         }
     }
-    if (Car.y < 16 * 3) {
-        HonkPos = 0
-    } else if (Car.y < 16 * 4) {
-        HonkPos = 1
-    } else if (Car.y < 16 * 5) {
-        HonkPos = 2
-    } else if (Car.y < 16 * 6) {
-        HonkPos = 3
-    } else {
-        HonkPos = 4
-    }
 })
 game.onUpdate(function () {
     for (let SlowCar of SlowCars) {
@@ -473,9 +475,7 @@ game.onUpdate(function () {
         if (sprites.readDataNumber(SlowCar, "Num") <= 0 && sprites.readDataBoolean(SlowCar, "Destroy")) {
             SlowCar.destroy(effects.halo, 100)
             music.magicWand.play()
-            for (let SlowCar of SlowCars) {
-                sprites.setDataBoolean(SlowCar, "Destroy", false)
-            }
+            make_slow_cars_undestructible()
         }
     }
 })
