@@ -8,7 +8,8 @@
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
         "Timers": "github:darzu/arcade-timers#v1.0.0",
         "pxt-image-morph": "github:unicycledumptruck/pxt-image-morph#v0.5.0",
-        "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0"
+        "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0",
+        "pxt-lantern": "github:felixtsu/pxt-lantern#v0.1.7"
     },
     "files": [
         "main.blocks",
