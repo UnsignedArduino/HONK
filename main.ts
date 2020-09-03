@@ -151,17 +151,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Heart, function (sprite, otherSp
     otherSprite.destroy(effects.disintegrate, 100)
     music.powerUp.play()
 })
-function play_music () {
-    for (let Index = 0; Index <= Song.length; Index++) {
-        if (Splash) {
-            if (Song[Index] == 0) {
-                music.rest(Durations[Index])
-            } else {
-                music.playTone(Song[Index], Durations[Index])
-            }
-        }
-    }
-}
 function summon_heart (x: number, y: number) {
     Heart = sprites.create(img`
         . c 2 2 . . 2 2 . 
@@ -224,54 +213,6 @@ info.onLifeZero(function () {
         game.over(false)
     })
 })
-function add_measures_1_7 () {
-    for (let Note2 of [
-    784,
-    494,
-    659,
-    740,
-    784,
-    659,
-    740,
-    784
-    ]) {
-        add_note(Note2, music.beat(BeatFraction.Half))
-    }
-    add_note(740, music.beat(BeatFraction.Double))
-    add_note(988, music.beat(BeatFraction.Double))
-    for (let Note2 of [
-    659,
-    392,
-    523,
-    587,
-    659,
-    523,
-    587,
-    659
-    ]) {
-        add_note(Note2, music.beat(BeatFraction.Half))
-    }
-    add_note(587, music.beat(BeatFraction.Double))
-    add_note(784, music.beat(BeatFraction.Double))
-    for (let Note2 of [523, 330, 440, 494]) {
-        add_note(Note2, music.beat(BeatFraction.Half))
-    }
-    add_note(523, music.beat(BeatFraction.Double))
-    for (let Note2 of [494, 294, 392, 440]) {
-        add_note(Note2, music.beat(BeatFraction.Half))
-    }
-    add_note(494, music.beat(BeatFraction.Double))
-    for (let index = 0; index < 5; index++) {
-        add_note(659, music.beat(BeatFraction.Half))
-    }
-    for (let Note2 of [740, 659, 587]) {
-        add_note(Note2, music.beat(BeatFraction.Half))
-    }
-}
-function add_note (note: number, duration: number) {
-    Song.push(note)
-    Durations.push(duration)
-}
 function summon_coin (x: number, y: number) {
     Coin = sprites.create(img`
         . . b b b b . . 
@@ -310,8 +251,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 let Coin: Sprite = null
 let PowerUp: Sprite = null
 let Heart: Sprite = null
-let Durations: number[] = []
-let Song: number[] = []
 let RandomNumber = 0
 let SelectedCarImage = 0
 let CarImages: Image[][] = []
@@ -637,23 +576,5 @@ forever(function () {
             ................................................................................................................................................................
             `)
         pause(5000)
-    }
-})
-forever(function () {
-    Song = []
-    Durations = []
-    for (let index = 0; index < 2; index++) {
-        add_measures_1_7()
-        for (let Note2 of [659, 587, 659, 740]) {
-            add_note(Note2, music.beat(BeatFraction.Whole))
-        }
-        add_measures_1_7()
-        add_note(622, music.beat(BeatFraction.Breve))
-    }
-    music.setTempo(145)
-    pause(2000)
-    while (true) {
-        play_music()
-        pause(2000)
     }
 })
