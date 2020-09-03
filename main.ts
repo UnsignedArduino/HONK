@@ -5,9 +5,7 @@ namespace SpriteKind {
     export const PowerUp = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Splash)) {
-        Car.vy = -32
-    }
+    Car.vy = -32
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite, otherSprite) {
     info.changeScoreBy(randint(5, 20))
@@ -97,6 +95,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     } else {
         color.startFade(color.originalPalette, color.Black, 250)
         color.pauseUntilFadeDone()
+        pause(250)
         Night = !(Night)
         multilights.toggleLighting(Night)
         color.startFade(color.Black, color.originalPalette, 250)
@@ -191,9 +190,7 @@ function get_last_slowcar () {
     return SlowCars[SlowCars.length - 1]
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Splash)) {
-        Car.vy = 32
-    }
+    Car.vy = 32
 })
 function summon_powerup_extra_noise (x: number, y: number) {
     PowerUpSprite = sprites.create(img`
@@ -503,6 +500,11 @@ game.onUpdate(function () {
             music.magicWand.play()
             make_slow_cars_undestructible()
         }
+    }
+})
+game.onUpdate(function () {
+    if (Splash) {
+        Car.top = 16 * 4
     }
 })
 forever(function () {
